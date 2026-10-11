@@ -1,0 +1,42 @@
+{
+  "splits": {
+    "train": {
+      "images": 14122,
+      "labels_written": 14122,
+      "empty_labels": 6458,
+      "smoke_boxes": 7788,
+      "fire_boxes": 9631,
+      "total_boxes": 17419,
+      "removed_invalid_rows": 13,
+      "clipped_boxes": 255
+    },
+    "val": {
+      "images": 3099,
+      "labels_written": 3099,
+      "empty_labels": 1375,
+      "smoke_boxes": 1755,
+      "fire_boxes": 2176,
+      "total_boxes": 3931,
+      "removed_invalid_rows": 1,
+      "clipped_boxes": 62
+    },
+    "test": {
+      "images": 4306,
+      "labels_written": 4306,
+      "empty_labels": 2008,
+      "smoke_boxes": 2303,
+      "fire_boxes": 2878,
+      "total_boxes": 5181,
+      "removed_invalid_rows": 12,
+      "clipped_boxes": 54
+    }
+  },
+  "total_images": 21527,
+  "total_boxes": 26531,
+  "class_counts": {
+    "smoke": 11846,
+    "fire": 14685
+  },
+  "removed_invalid_rows": 26,
+  "policy": "Invalid annotation rows rejected; boxes crossing image boundaries clipped to visible image bounds."
+}

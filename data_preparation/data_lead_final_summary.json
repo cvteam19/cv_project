@@ -1,0 +1,45 @@
+{
+  "dataset": "D-Fire YOLO-ready dataset",
+  "prepared_data_path": "/kaggle/working/dfire_prepared/data",
+  "ultralytics_yaml": "/kaggle/working/dfire_prepared/data.yaml",
+  "splits": {
+    "train": {
+      "images": 14122,
+      "empty_labels": 6458,
+      "boxes": 17419,
+      "smoke_boxes": 7788,
+      "fire_boxes": 9631
+    },
+    "val": {
+      "images": 3099,
+      "empty_labels": 1375,
+      "boxes": 3931,
+      "smoke_boxes": 1755,
+      "fire_boxes": 2176
+    },
+    "test": {
+      "images": 4306,
+      "empty_labels": 2008,
+      "boxes": 5181,
+      "smoke_boxes": 2303,
+      "fire_boxes": 2878
+    }
+  },
+  "total_images": 21527,
+  "total_boxes": 26531,
+  "total_smoke_boxes": 11846,
+  "total_fire_boxes": 14685,
+  "invalid_label_rows_removed": 26,
+  "clipped_boxes": 371,
+  "negative_train_candidates": 6458,
+  "negative_candidate_policy": "Train images with empty prepared labels; not independently verified one by one.",
+  "original_dataset_modified": false,
+  "test_split_used_for_training": false,
+  "ultralytics_loader_smoke_tests": {
+    "YOLOv8s": "PASSED: tiny smoke test completed",
+    "RT-DETR": "PASSED: tiny smoke test completed",
+    "Faster R-CNN DataLoader": "PASSED: dataset and batch checks completed"
+  },
+  "documentation": "/kaggle/working/dfire_prepared/README_DATA_LEAD.md",
+  "negative_samples_csv": "/kaggle/working/dfire_prepared/negative_samples_train.csv"
+}
