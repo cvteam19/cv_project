@@ -4,7 +4,7 @@
 
 ## 1. Objective
 
-The Data Lead was responsible for preparing the dataset for fire and smoke object detection, verifying dataset splits and annotation integrity, creating a list of negative-sample candidates, and providing data-loading support for YOLOv8s, Faster R-CNN, and RT-DETR.
+The Data Lead was responsible for preparing the dataset for fire and smoke object detection, verifying dataset splits and annotation integrity, creating a list of negative-sample candidates, packaging the prepared dataset for reuse, and providing data-loading support for YOLOv8s, Faster R-CNN, and RT-DETR.
 
 ## 2. Dataset
 
@@ -25,20 +25,39 @@ The dataset contains 21,527 images across the predefined training, validation, a
 
 The source dataset description reports 26,557 bounding boxes: 14,692 fire boxes and 11,865 smoke boxes. During preparation, 26 invalid annotation rows were removed: 19 smoke rows and 7 fire rows.
 
-The prepared dataset therefore contains 26,531 valid bounding boxes:
+The prepared dataset contains 26,531 valid bounding boxes:
 
 - 14,685 fire boxes
 - 11,846 smoke boxes
 
-The original dataset was not modified. The prepared dataset was created separately at:
+The original dataset was not modified. The prepared annotations were stored separately, and the original images were paired with their corresponding prepared labels.
 
-`/kaggle/working/dfire_prepared/data`
+A portable archive, `dfire_prepared_dataset.zip`, was created to package the images, prepared labels, and `data.yaml` configuration in one file.
 
-**Important:** This path is specific to the original Kaggle runtime. The prepared files must be saved and made available as a dataset input to use them in another notebook.
+The archive uses the following structure:
+
+```text
+dfire_prepared_dataset.zip
+├── data.yaml
+└── data/
+    ├── train/
+    │   ├── images/
+    │   └── labels/
+    ├── val/
+    │   ├── images/
+    │   └── labels/
+    └── test/
+        ├── images/
+        └── labels/
+```
+
+The archive contains 21,527 images and 21,527 corresponding prepared label files. Its recorded size was approximately 2,906.51 MB. The ZIP integrity check completed successfully.
+
+**Important:** The archive is stored in the Kaggle working environment until downloaded or saved through a supported persistence mechanism. A file in `/kaggle/working` is not automatically a permanent, independently accessible dataset.
 
 ## 3. Dataset Audit
 
-The audit checked image counts, label-file correspondence, annotation formats, class IDs, normalized coordinates, image readability, and bounding boxes crossing image boundaries.
+The audit checked image counts, label-file correspondence, annotation formats, class IDs, normalized coordinates, and bounding boxes crossing image boundaries.
 
 ### Prepared Dataset Statistics
 
@@ -53,8 +72,9 @@ The audit and preparation identified the following:
 
 - 26 invalid annotation rows were removed from the prepared copy.
 - 371 bounding boxes crossing image boundaries were clipped to the visible image area.
-- No missing label files, orphan label files, or unreadable images were reported by the audit.
+- The audit reported no missing label files, orphan label files, or unreadable images.
 - No exact image duplicates were found across splits in the reported MD5 comparison.
+- A subsequent validation of the prepared labels found zero malformed rows, invalid class IDs, non-finite coordinate values, or coordinates outside the accepted normalized range.
 
 Selected problematic annotations were visually inspected. The reviewed examples showed visible smoke or fire, including objects extending beyond image boundaries. Clipping retained the portion of each affected bounding box inside the image.
 
@@ -74,6 +94,11 @@ The preparation procedure:
 - Preserved valid class IDs and normalized YOLO coordinates.
 - Retained empty label files.
 - Preserved the original dataset and its train, validation, and test assignments.
+- Packaged the original images together with their corresponding prepared label files.
+
+The prepared annotations were checked programmatically for the expected five-field YOLO format, valid class IDs, finite numeric values, normalized coordinates, and positive bounding-box width and height.
+
+These checks establish structural validity, but do not guarantee that every bounding box perfectly matches the visible object.
 
 Empty label files are treated as images without annotated objects. This interpretation is based on the annotations and does not independently prove that every such image is free of visible smoke or fire.
 
@@ -103,7 +128,7 @@ A short one-epoch smoke test using a small fraction of the training data complet
 
 ### RT-DETR
 
-RT-DETR was tested using the same Ultralytics dataset configuration. A short one-epoch smoke test completed successfully.
+RT-DETR was tested using the Ultralytics pipeline and dataset configuration. A short one-epoch smoke test completed successfully.
 
 **Result:** PASSED — tiny smoke test completed.
 
@@ -118,15 +143,17 @@ The loader returns:
 - Class labels following the Torchvision detection convention: `0` for background, `1` for smoke, and `2` for fire.
 - Image IDs, box areas, and crowd flags.
 
-In the recorded loader test, a batch of four images was loaded successfully. The first image had tensor shape `(3, 720, 1280)`, and its target contained two bounding boxes.
-
 The dataset returns images at their original dimensions. The Torchvision detection model handles resizing internally.
+
+In the recorded DataLoader test, a batch of four images was loaded successfully. The first image had tensor shape `(3, 610, 1086)`, and its target contained zero bounding boxes.
+
+An empty target is valid for an image with no annotated objects. However, the first image alone does not establish that all dataset targets are correct.
 
 **Result:** PASSED — dataset and batch checks completed.
 
-The YOLOv8s and RT-DETR smoke tests verified basic pipeline execution, not final model performance. The Faster R-CNN test verified data loading and target formatting, not successful model training.
+The YOLOv8s and RT-DETR smoke tests verified basic pipeline execution, not final model performance. The Faster R-CNN test verified data loading and batch compatibility, not successful model training.
 
-## 7. Data Configuration and Documentation
+## 7. Data Configuration, Packaging, and Documentation
 
 The preparation workflow produced the following artifacts:
 
@@ -139,36 +166,31 @@ The preparation workflow produced the following artifacts:
 | `negative_samples_train.csv` | Training images with empty prepared labels |
 | `README_DATA_LEAD.md` | Dataset preparation and pipeline documentation |
 | `data-preparation.ipynb` | Notebook containing the preparation workflow and data-loading code |
+| `dfire_prepared_dataset.zip` | Portable archive containing images, prepared labels, and `data.yaml` |
 
-The PyTorch `FireSmokeDataset` and its detection collate function are available in the Data Lead notebook.
+The final archive was created at:
 
-The current `data.yaml` uses the Kaggle runtime path `/kaggle/working/dfire_prepared/data`. This path must be updated when running the pipeline in another environment.
+`/kaggle/working/dfire_prepared_dataset.zip`
+
+The archive verification reported:
+
+- Images: 21,527
+- Prepared labels: 21,527
+- ZIP integrity check: passed (`testzip()` returned `None`)
+
+The archive's `data.yaml` uses relative paths:
+
+- `data/train/images`
+- `data/val/images`
+- `data/test/images`
+
+This configuration is intended to be used from the extracted archive root. After extraction, the dataset can be connected to a compatible training notebook without relying on the original `/kaggle/working/dfire_prepared/data` path.
+
+The Faster R-CNN `FireSmokeDataset` and its detection collate function are available in the Data Lead notebook.
 
 ## 8. Split and Evaluation Policy
 
 The dataset splits are used as follows:
 
 - **Train:** model fitting.
-- **Validation:** model selection and hyperparameter tuning.
-- **Test:** final evaluation only.
-
-The test split must not be used for training or model tuning.
-
-The dataset preparation stage did not include full model training, a final comparison of the three architectures, or final test-set evaluation. The short smoke tests do not establish model quality.
-
-## 9. Limitations
-
-- The prepared annotations were cleaned, but the original dataset was left unchanged.
-- Empty labels and negative-sample candidates were not all independently verified by visual inspection.
-- The 6,458 candidates should not be treated as a fully verified hard-negative dataset.
-- Smoke tests verify basic pipeline execution or data loading; they do not replace full training and evaluation.
-- Dataset paths in the configuration are specific to the current Kaggle environment.
-- The notebook Output link does not by itself guarantee that the prepared dataset is permanently available to other users or notebooks.
-
-## 10. Conclusion
-
-The dataset preparation workflow produced a separate working copy of the D-Fire dataset, audited its splits and annotations, removed invalid annotation rows, clipped bounding boxes crossing image boundaries, generated a list of negative-sample candidates, and provided data-loading support for the project models.
-
-The prepared dataset contains 21,527 images and 26,531 valid bounding boxes. The original split assignments were preserved, and the test split remains reserved for final evaluation.
-
-The pipeline checks completed successfully for YOLOv8s, RT-DETR, and the Faster R-CNN DataLoader. These results document dataset preparation and basic pipeline checks. Final conclusions about detection quality must be based on the team's full training and evaluation results.
+-
