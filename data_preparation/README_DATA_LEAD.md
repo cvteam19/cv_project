@@ -2,8 +2,11 @@
 
 ## Dataset
 
-D-Fire YOLO-ready dataset:  
+**Original D-Fire YOLO-ready dataset:**  
 https://www.kaggle.com/datasets/sayedgamal99/smoke-fire-detection-yolo
+
+**Prepared dataset (published on Kaggle):**  
+https://www.kaggle.com/datasets/linxel/dfire-prepared
 
 **Data preparation notebook and outputs:**  
 https://www.kaggle.com/code/linxel/data-preparation/output
@@ -11,10 +14,10 @@ https://www.kaggle.com/code/linxel/data-preparation/output
 Prepared dataset path in the original Kaggle session:  
 `/kaggle/working/dfire_prepared/data`
 
-Ultralytics configuration:  
+Ultralytics configuration in the original Kaggle session:  
 `/kaggle/working/dfire_prepared/data.yaml`
 
-**Important:** The prepared dataset path above is specific to the Kaggle runtime. Opening the notebook output link does not automatically make the prepared files available in another notebook. The prepared dataset must be saved and added as an input to the notebook that uses it.
+**Important:** The prepared dataset is published separately on Kaggle so it can be added as an input to other notebooks. The paths under `/kaggle/working/` are specific to the original Kaggle runtime and are not automatically available in another notebook. When using the published dataset, check its directory structure and update the dataset configuration path if necessary.
 
 ## Fixed dataset splits
 
@@ -40,8 +43,11 @@ Class IDs in YOLO labels:
 
 ## Negative samples
 
-A CSV of train images with empty prepared labels is available at:
+A CSV of train images with empty prepared labels is available in the data preparation outputs:
 
+`negative_samples_train.csv`
+
+Original Kaggle working path:  
 `/kaggle/working/dfire_prepared/negative_samples_train.csv`
 
 Number of candidates: 6458.
@@ -50,19 +56,17 @@ These are treated as negative-sample candidates based on the dataset annotations
 
 ## Model data loading
 
-- YOLOv8s: use the Ultralytics configuration in `data.yaml`.
-- RT-DETR: use the same Ultralytics configuration in `data.yaml`.
-- Faster R-CNN: use the PyTorch `FireSmokeDataset` and detection collate function from the Data Lead notebook. Torchvision class IDs are shifted: smoke = 1, fire = 2, background = 0.
+- **YOLOv8s:** use the Ultralytics configuration in `data.yaml`.
+- **RT-DETR:** use the same Ultralytics configuration in `data.yaml`.
+- **Faster R-CNN:** use the PyTorch `FireSmokeDataset` and detection collate function from the Data Lead notebook. Torchvision class IDs are shifted: smoke = 1, fire = 2, background = 0.
 - Images may have different original dimensions. The Faster R-CNN dataset returns images in their original resolution; the Torchvision detection model applies its own resizing pipeline.
 
 ## Split policy
 
-- Train is used for model fitting.
-- Validation is used for model selection and tuning.
-- Test is reserved for final evaluation and must not be used for training or tuning.
+- **Train** is used for model fitting.
+- **Validation** is used for model selection and tuning.
+- **Test** is reserved for final evaluation and must not be used for training or tuning.
 
 ## Important limitations
 
-- A successful data audit does not prove model quality.
-- The negative candidate list was generated from empty labels, not from a manual review of every image.
-- A loader smoke test is not a substitute for full training or evaluation.
+- A successful data audit
