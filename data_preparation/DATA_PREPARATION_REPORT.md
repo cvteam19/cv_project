@@ -12,6 +12,10 @@ The project uses the D-Fire dataset in YOLO annotation format, obtained from Kag
 
 https://www.kaggle.com/datasets/sayedgamal99/smoke-fire-detection-yolo
 
+**Data preparation notebook and outputs:**
+
+https://www.kaggle.com/code/linxel/data-preparation/output
+
 The dataset contains two classes:
 
 - Class 0 — smoke
@@ -26,9 +30,11 @@ The prepared dataset therefore contains 26,531 valid bounding boxes:
 - 14,685 fire boxes
 - 11,846 smoke boxes
 
-The original dataset was not modified. The prepared dataset is stored separately at:
+The original dataset was not modified. The prepared dataset was created separately at:
 
 `/kaggle/working/dfire_prepared/data`
+
+**Important:** This path is specific to the original Kaggle runtime. The prepared files must be saved and made available as a dataset input to use them in another notebook.
 
 ## 3. Dataset Audit
 
@@ -132,7 +138,7 @@ The preparation workflow produced the following artifacts:
 | `removed_label_rows.csv` | Invalid annotation rows removed during preparation |
 | `negative_samples_train.csv` | Training images with empty prepared labels |
 | `README_DATA_LEAD.md` | Dataset preparation and pipeline documentation |
-| `data_preparation.ipynb` | Notebook containing the preparation workflow and data-loading code |
+| `data-preparation.ipynb` | Notebook containing the preparation workflow and data-loading code |
 
 The PyTorch `FireSmokeDataset` and its detection collate function are available in the Data Lead notebook.
 
@@ -150,8 +156,6 @@ The test split must not be used for training or model tuning.
 
 The dataset preparation stage did not include full model training, a final comparison of the three architectures, or final test-set evaluation. The short smoke tests do not establish model quality.
 
-During the evaluation stage, the team should report metrics such as mean Average Precision (mAP), precision, and recall, and analyze false positives, including detections caused by clouds, fog, lighting, and bright objects.
-
 ## 9. Limitations
 
 - The prepared annotations were cleaned, but the original dataset was left unchanged.
@@ -159,6 +163,7 @@ During the evaluation stage, the team should report metrics such as mean Average
 - The 6,458 candidates should not be treated as a fully verified hard-negative dataset.
 - Smoke tests verify basic pipeline execution or data loading; they do not replace full training and evaluation.
 - Dataset paths in the configuration are specific to the current Kaggle environment.
+- The notebook Output link does not by itself guarantee that the prepared dataset is permanently available to other users or notebooks.
 
 ## 10. Conclusion
 
