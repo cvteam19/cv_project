@@ -10,11 +10,16 @@ The Data Lead was responsible for preparing the dataset for fire and smoke objec
 
 The project uses the D-Fire dataset in YOLO annotation format, obtained from Kaggle:
 
+**Original dataset:**  
 https://www.kaggle.com/datasets/sayedgamal99/smoke-fire-detection-yolo
 
-**Data preparation notebook and outputs:**
+**Prepared dataset:**  
+https://www.kaggle.com/datasets/linxel/dfire-prepared
 
+**Data preparation notebook and outputs:**  
 https://www.kaggle.com/code/linxel/data-preparation/output
+
+The prepared dataset is published as a separate Kaggle Dataset to make the corrected annotations and dataset files accessible for reuse.
 
 The dataset contains two classes:
 
@@ -53,7 +58,7 @@ dfire_prepared_dataset.zip
 
 The archive contains 21,527 images and 21,527 corresponding prepared label files. Its recorded size was approximately 2,906.51 MB. The ZIP integrity check completed successfully.
 
-**Important:** The archive is stored in the Kaggle working environment until downloaded or saved through a supported persistence mechanism. A file in `/kaggle/working` is not automatically a permanent, independently accessible dataset.
+**Important:** The archive in `/kaggle/working/` is a temporary working file. The published Kaggle Dataset provides a separate reusable distribution of the prepared data.
 
 ## 3. Dataset Audit
 
@@ -168,6 +173,9 @@ The preparation workflow produced the following artifacts:
 | `data-preparation.ipynb` | Notebook containing the preparation workflow and data-loading code |
 | `dfire_prepared_dataset.zip` | Portable archive containing images, prepared labels, and `data.yaml` |
 
+**Published prepared dataset:**  
+https://www.kaggle.com/datasets/linxel/dfire-prepared
+
 The final archive was created at:
 
 `/kaggle/working/dfire_prepared_dataset.zip`
@@ -193,4 +201,17 @@ The Faster R-CNN `FireSmokeDataset` and its detection collate function are avail
 The dataset splits are used as follows:
 
 - **Train:** model fitting.
--
+- **Validation:** model selection and hyperparameter tuning.
+- **Test:** final evaluation after model selection.
+
+The test split should not be used for routine training or hyperparameter tuning.
+
+## 9. Summary
+
+The Data Lead prepared and audited a separate version of the D-Fire dataset while preserving the original images and split assignments. The prepared annotations contain 26,531 valid bounding boxes after removing 26 invalid annotation rows and clipping 371 boundary-crossing boxes.
+
+The prepared dataset includes 21,527 images and corresponding label files and is published on Kaggle for reuse:
+
+https://www.kaggle.com/datasets/linxel/dfire-prepared
+
+The data-loading pipeline was checked for YOLOv8s, RT
