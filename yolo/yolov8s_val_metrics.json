@@ -1,0 +1,96 @@
+{
+  "metrics": {
+    "map50": 0.6378518342971802,
+    "map50_95": 0.34119048714637756,
+    "per_class_map50_95": {
+      "smoke": 0.3901824653148651,
+      "fire": 0.29219850897789
+    }
+  },
+  "operating": [
+    {
+      "threshold": 0.3,
+      "class_name": "all",
+      "tp": 2274,
+      "fp": 1146,
+      "fn": 1657,
+      "precision": 0.6649122807017543,
+      "recall": 0.5784787585856016,
+      "f1": 0.6186913345123112,
+      "negative_images": 1375,
+      "false_alarm_images": 44,
+      "false_alarm_rate": 0.032,
+      "empty_image_fp": 53,
+      "fp_per_empty_image": 0.03854545454545454
+    },
+    {
+      "threshold": 0.3,
+      "class_name": "smoke",
+      "tp": 1185,
+      "fp": 518,
+      "fn": 570,
+      "precision": 0.6958308866705814,
+      "recall": 0.6752136752136753,
+      "f1": 0.6853672643146328,
+      "negative_images": 1375,
+      "false_alarm_images": 39,
+      "false_alarm_rate": 0.028363636363636365,
+      "empty_image_fp": 43,
+      "fp_per_empty_image": 0.03127272727272727
+    },
+    {
+      "threshold": 0.3,
+      "class_name": "fire",
+      "tp": 1089,
+      "fp": 628,
+      "fn": 1087,
+      "precision": 0.6342457775189284,
+      "recall": 0.5004595588235294,
+      "f1": 0.5594657076804522,
+      "negative_images": 1375,
+      "false_alarm_images": 6,
+      "false_alarm_rate": 0.004363636363636364,
+      "empty_image_fp": 10,
+      "fp_per_empty_image": 0.007272727272727273
+    }
+  ],
+  "confusion_matrix": {
+    "labels": [
+      "smoke",
+      "fire",
+      "background"
+    ],
+    "rows": "true",
+    "columns": "predicted",
+    "background_background": "not defined for object detection",
+    "values": [
+      [
+        1185,
+        8,
+        562
+      ],
+      [
+        13,
+        1089,
+        1074
+      ],
+      [
+        505,
+        620,
+        0
+      ]
+    ]
+  },
+  "timing": {
+    "batch": 4,
+    "warmup_batches": 3,
+    "seconds": 48.355279736008015,
+    "ms_per_image": 15.603510724752505,
+    "fps": 64.08814129333457,
+    "scope": "RGB PIL -> preprocessing, H2D, inference, postprocessing; excludes decode, D2H outputs, metrics"
+  },
+  "confidence": 0.3,
+  "matching_iou": 0.5,
+  "images": 3099,
+  "fp_per_empty_image_target_passed": true
+}

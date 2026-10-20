@@ -1,0 +1,9 @@
+{
+  "yolov8s": {
+    "threshold": 0.3,
+    "split": "val",
+    "imgsz": 640,
+    "criterion": "maximum validation micro-F1",
+    "batch": 4
+  }
+}

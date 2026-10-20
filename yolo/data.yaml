@@ -1,0 +1,8 @@
+path: /kaggle/working/dfire_main_from_prepared
+train: train/images
+val: val/images
+test: test/images
+names:
+  0: smoke
+  1: fire
+nc: 2

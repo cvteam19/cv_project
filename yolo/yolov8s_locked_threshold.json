@@ -1,0 +1,6 @@
+{
+  "threshold": 0.3,
+  "split": "val",
+  "criterion": "maximum micro-F1; ties: recall, then higher threshold",
+  "matching_iou": 0.5
+}

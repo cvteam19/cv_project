@@ -1,0 +1,14 @@
+{
+  "checkpoint": "selected_best.pt",
+  "bytes": 22494826,
+  "sha256": "054780cd560b52a2243954afa18494fbd993a2222a04d5860cd08d32263847ec",
+  "selected_epoch": 14,
+  "selection_split": "val",
+  "selection_metric": "torchmetrics COCO mAP@0.5:0.95",
+  "logged_best_validation_map50_95": 0.34107,
+  "reevaluated_validation_map50_95": 0.34119048714637756,
+  "source_archive": "yolov8s_agreed_3h_artifacts.zip",
+  "source_archive_sha256": "33e2a552c53b7b65303a992995a26a13d6cb384b3dd9333101b074e83c64b0b8",
+  "test_results_in_this_package": false,
+  "inference_adapter": "final_yolo_protocol.predict_with_baseline_input"
+}
