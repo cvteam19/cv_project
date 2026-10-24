@@ -1,0 +1,25 @@
+{
+  "independent_coco_style_ap": {
+    "map50": 0.6484262785353668,
+    "map50_95": 0.3452478339957869,
+    "per_class_map50_95": {
+      "smoke": 0.4007074100344171,
+      "fire": 0.28978825795715674
+    }
+  },
+  "ap_differences_from_reported": {
+    "map50": 2.4876036651688693e-06,
+    "map50_95": 4.201202360387679e-06
+  },
+  "ap_agreement_tolerance": 1e-05,
+  "reported_metrics_preserved": true,
+  "operating_counts_verified_exactly": true,
+  "confusion_matrix_verified_exactly": true,
+  "validation_threshold_grid_verified": true,
+  "images": 3099,
+  "gt_instances": 3931,
+  "best_epoch": 17,
+  "logged_epochs": 20,
+  "selected_checkpoint_sha256": "fb07b1aefc26ef86efd6d7fa8eab1d51d9b7345f28c89cb35db508b4ddde2355",
+  "checkpoint_data_not_executed": true
+}

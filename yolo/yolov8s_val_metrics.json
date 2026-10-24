@@ -1,57 +1,57 @@
 {
   "metrics": {
-    "map50": 0.6378518342971802,
-    "map50_95": 0.34119048714637756,
+    "map50": 0.6484237909317017,
+    "map50_95": 0.3452436327934265,
     "per_class_map50_95": {
-      "smoke": 0.3901824653148651,
-      "fire": 0.29219850897789
+      "smoke": 0.4006989896297455,
+      "fire": 0.28978824615478516
     }
   },
   "operating": [
     {
       "threshold": 0.3,
       "class_name": "all",
-      "tp": 2274,
-      "fp": 1146,
-      "fn": 1657,
-      "precision": 0.6649122807017543,
-      "recall": 0.5784787585856016,
-      "f1": 0.6186913345123112,
+      "tp": 2280,
+      "fp": 925,
+      "fn": 1651,
+      "precision": 0.7113884555382215,
+      "recall": 0.5800050877639278,
+      "f1": 0.6390134529147983,
       "negative_images": 1375,
-      "false_alarm_images": 44,
-      "false_alarm_rate": 0.032,
-      "empty_image_fp": 53,
-      "fp_per_empty_image": 0.03854545454545454
+      "false_alarm_images": 35,
+      "false_alarm_rate": 0.025454545454545455,
+      "empty_image_fp": 39,
+      "fp_per_empty_image": 0.028363636363636365
     },
     {
       "threshold": 0.3,
       "class_name": "smoke",
-      "tp": 1185,
-      "fp": 518,
-      "fn": 570,
-      "precision": 0.6958308866705814,
-      "recall": 0.6752136752136753,
-      "f1": 0.6853672643146328,
+      "tp": 1183,
+      "fp": 413,
+      "fn": 572,
+      "precision": 0.7412280701754386,
+      "recall": 0.674074074074074,
+      "f1": 0.706057893166219,
       "negative_images": 1375,
-      "false_alarm_images": 39,
-      "false_alarm_rate": 0.028363636363636365,
-      "empty_image_fp": 43,
-      "fp_per_empty_image": 0.03127272727272727
+      "false_alarm_images": 31,
+      "false_alarm_rate": 0.022545454545454546,
+      "empty_image_fp": 34,
+      "fp_per_empty_image": 0.024727272727272726
     },
     {
       "threshold": 0.3,
       "class_name": "fire",
-      "tp": 1089,
-      "fp": 628,
-      "fn": 1087,
-      "precision": 0.6342457775189284,
-      "recall": 0.5004595588235294,
-      "f1": 0.5594657076804522,
+      "tp": 1097,
+      "fp": 512,
+      "fn": 1079,
+      "precision": 0.6817899316345556,
+      "recall": 0.5041360294117647,
+      "f1": 0.5796565389696168,
       "negative_images": 1375,
-      "false_alarm_images": 6,
-      "false_alarm_rate": 0.004363636363636364,
-      "empty_image_fp": 10,
-      "fp_per_empty_image": 0.007272727272727273
+      "false_alarm_images": 4,
+      "false_alarm_rate": 0.002909090909090909,
+      "empty_image_fp": 5,
+      "fp_per_empty_image": 0.0036363636363636364
     }
   ],
   "confusion_matrix": {
@@ -65,18 +65,18 @@
     "background_background": "not defined for object detection",
     "values": [
       [
-        1185,
-        8,
-        562
+        1183,
+        4,
+        568
       ],
       [
-        13,
-        1089,
-        1074
+        12,
+        1097,
+        1067
       ],
       [
-        505,
-        620,
+        401,
+        508,
         0
       ]
     ]
@@ -84,9 +84,9 @@
   "timing": {
     "batch": 4,
     "warmup_batches": 3,
-    "seconds": 48.355279736008015,
-    "ms_per_image": 15.603510724752505,
-    "fps": 64.08814129333457,
+    "seconds": 43.92620437896039,
+    "ms_per_image": 14.174315707957533,
+    "fps": 70.55014299128352,
     "scope": "RGB PIL -> preprocessing, H2D, inference, postprocessing; excludes decode, D2H outputs, metrics"
   },
   "confidence": 0.3,

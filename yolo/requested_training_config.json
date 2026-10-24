@@ -1,10 +1,10 @@
 {
-  "data": "/kaggle/working/yolov8s_agreed_3h/data.yaml",
-  "project": "/kaggle/working/yolov8s_agreed_3h",
+  "data": "/kaggle/working/yolov8s_baseline_time/data.yaml",
+  "project": "/kaggle/working/yolov8s_baseline_time",
   "name": "train",
   "exist_ok": false,
   "epochs": 1000,
-  "time": 3.0,
+  "time": 4.024500000000001,
   "patience": 3,
   "imgsz": 640,
   "batch": 4,

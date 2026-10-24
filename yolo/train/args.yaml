@@ -1,9 +1,9 @@
 task: detect
 mode: train
 model: yolov8s.pt
-data: /kaggle/working/yolov8s_agreed_3h/data.yaml
+data: /kaggle/working/yolov8s_baseline_time/data.yaml
 epochs: 1000
-time: 3.0
+time: 4.024500000000001
 patience: 3
 batch: 4
 imgsz: 640
@@ -12,7 +12,7 @@ save_period: -1
 cache: false
 device: '0'
 workers: 2
-project: /kaggle/working/yolov8s_agreed_3h
+project: /kaggle/working/yolov8s_baseline_time
 name: train
 exist_ok: false
 pretrained: true
@@ -103,4 +103,4 @@ auto_augment: randaugment
 erasing: 0.4
 cfg: null
 tracker: botsort.yaml
-save_dir: /kaggle/working/yolov8s_agreed_3h/train
+save_dir: /kaggle/working/yolov8s_baseline_time/train

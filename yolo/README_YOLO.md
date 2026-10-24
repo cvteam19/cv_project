@@ -2,8 +2,8 @@
 
 Main model lead: **Daria Potapova** (`dariapotapova`).
 
-This folder contains the selected **new SGD run**. Earlier YOLO/AdamW experiments are
-not included. The results below are validation results, not a final test comparison.
+This folder contains the selected **baseline-time-matched SGD rerun**. Earlier YOLO/AdamW and three-hour SGD experiments are not the active version;
+previous committed results remain available through Git history. The results below are validation results, not a final test comparison.
 
 ## Model and data
 
@@ -29,15 +29,19 @@ not included. The results below are validation results, not a final test compari
 | Mosaic, HSV, scaling, translation | Disabled |
 | Warmup / EMA averaging | Disabled / disabled |
 | Gradient clipping / seed | Norm 10 / 42 |
-| Learning rate | Cosine by elapsed train+validation time, 0.005 to 0.000001 over 3 hours |
+| Learning rate | Cosine by elapsed train+validation time, 0.005 to 0.000001 over 14,488.2 seconds |
 | Best checkpoint | Maximum validation torchmetrics COCO mAP@0.5:0.95 |
 | Early stopping | Patience 3 on that metric, or time limit |
 
-The training call took **10,970.24 seconds** (about **3 h 3 min**, including its concluding
-validation). There are **16 logged epochs**, with the final epoch incomplete. The selected
-checkpoint is from **epoch 14**. The 1000-epoch setting was a technical upper guard, not
-a claim that 1000 epochs were completed. The native trainer adapts its epoch estimate
-when `time=3` is supplied.
+The configured budget was **14,488.2 seconds**, taken from the baseline's recorded
+duration. The training call took **14,419.82 seconds** (about **4 h 0 min 20 s**, including
+its concluding validation), versus **14,488.2 seconds** for the baseline: approximately
+**68 seconds less**. There are **20 logged epochs** and the selected checkpoint is from
+**epoch 17**. Epochs 18-20 did not improve its validation mAP, consistent with patience=3
+stopping before the budget. The generic `last_epoch_may_be_partial` metadata field is
+not evidence that epoch 20 was interrupted; its duration is comparable to prior epochs.
+The 1000-epoch setting was a technical upper guard. The native trainer adapts its epoch
+estimate when a time limit is supplied; effective `epochs=21` is not a completed-epoch count.
 
 `cos_lr=false` in args does not mean cosine decay was absent: `optimizer_step()` applies
 the explicit time-based schedule from `budget_protocol.py`. Classification-only defaults
@@ -51,16 +55,16 @@ The saved best checkpoint was reevaluated on 3,099 validation images, containing
 
 | Metric | Value |
 |---|---:|
-| mAP@0.5 | 0.6378518 |
-| mAP@0.5:0.95 | 0.3411905 |
-| Smoke AP@0.5:0.95 | 0.3901825 |
-| Fire AP@0.5:0.95 | 0.2921985 |
+| mAP@0.5 | 0.6484238 |
+| mAP@0.5:0.95 | 0.3452436 |
+| Smoke AP@0.5:0.95 | 0.4006990 |
+| Fire AP@0.5:0.95 | 0.2897882 |
 | Locked confidence | 0.30 |
-| Precision / recall / F1, micro | 0.6649 / 0.5785 / 0.6187 |
-| TP / FP / FN | 2,274 / 1,146 / 1,657 |
-| FP per empty image | 53 / 1,375 = 0.0385455 |
-| Empty images with any detection | 44 / 1,375 = 3.2% |
-| Recorded throughput / latency, batch 4 | 64.09 images/s / 15.60 ms per image |
+| Precision / recall / F1, micro | 0.7114 / 0.5800 / 0.6390 |
+| TP / FP / FN | 2,280 / 925 / 1,651 |
+| FP per empty image | 39 / 1,375 = 0.0283636 |
+| Empty images with any detection | 35 / 1,375 = 2.5455% |
+| Recorded throughput / latency, batch 4 | 70.55 images/s / 14.17 ms per image |
 
 Confidence was selected from the validation sweep by maximum micro-F1, with IoU >= 0.5
 class-aware matching. mAP uses score floor 0.001, NMS IoU 0.7, max detections 100.
@@ -71,10 +75,16 @@ it excludes file decoding, output D2H copies and metrics. Three warmup batches a
 synchronization were used. This is one recorded validation pass, not a definitive speed
 comparison with Faster R-CNN. Values are stored in `yolov8s_val_metrics.json`.
 
-The epoch-14 training log has mAP@0.5:0.95 **0.34107**, whereas reevaluation of the serialized
-checkpoint gives **0.3411905**. These are separate recorded measurements; the reevaluation
+The epoch-17 training log has mAP@0.5:0.95 **0.34542**, whereas reevaluation of the serialized
+checkpoint gives **0.3452436**. These are separate recorded measurements; the reevaluation
 value is used above. The checkpoint serializer stores model weights in FP16; they are
 loaded as FP32 for inference. Do not replace either recorded value with an invented match.
+
+## Verification
+
+`validation_audit.json` independently recomputes TP/FP/FN and the confusion matrix
+exactly, and COCO-style AP to within 1e-5 of the archived metrics. Original reported
+values are preserved; independent verification does not rerun model inference.
 
 ## Files
 
@@ -93,6 +103,10 @@ loaded as FP32 for inference. Do not replace either recorded value with an inven
   exact helper files included in the completed run's archive.
 - `yolov8s_val_*.json/csv/png/jpg`, `yolov8s_validation_*`, `locked_selection.json`:
   validation metrics, predictions, operating point, sensitivity and error candidates.
+- `baseline_budget_reference.json`: baseline duration and reference provenance.
+- `RUN_PROTOCOL_EN.md`: original pre-run instructions exported by the notebook;
+  its pre-run status text is not the status of this completed run.
+- `validation_audit.json`: independent verification of the saved predictions.
 - `SECOND_MODEL_REPORT.md`: short second-approach report with verified initial results.
 
 The archive only included the selected checkpoint, not `last.pt`. `selected_best.pt`
@@ -138,14 +152,17 @@ To run validation through Ultralytics, supply `validator=BaselineInputValidator`
 notebook demonstrates the complete evaluation workflow.
 
 Verify weights: SHA256
-`054780cd560b52a2243954afa18494fbd993a2222a04d5860cd08d32263847ec`.
+`fb07b1aefc26ef86efd6d7fa8eab1d51d9b7345f28c89cb35db508b4ddde2355`.
 
 ## Comparison limits and handoff
 
 The corrected baseline currently records validation mAP50 **0.7675** and mAP50:95
 **0.4204** after six epochs (about 4 h 1 min), using an epoch-based cosine schedule.
-YOLO used about three hours and a time-based schedule. Inference filtering also needs
-to be unified. The existing scores are preliminary, not an equal-budget architecture ablation.
+This YOLO rerun used approximately the same elapsed time on the same GPU type.
+The LR schedules still differ (baseline epoch-based, YOLO time-based), as do native
+detector inference-filtering defaults. These scores remain preliminary until the
+selected checkpoints are evaluated with a common procedure. Matching time alone does
+not establish a fully isolated architecture effect.
 
 The evaluation lead should use this **new SGD checkpoint** and its adapter for the final
 common test evaluation, choose baseline confidence on validation, and report common

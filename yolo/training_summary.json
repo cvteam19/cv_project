@@ -1,17 +1,32 @@
 {
-  "elapsed_train_call_seconds": 10970.244292349,
-  "logged_epochs": 16,
+  "elapsed_train_call_seconds": 14419.824918423,
+  "logged_epochs": 20,
+  "planned_time_limit_seconds": 14488.2,
+  "baseline_reference": {
+    "source": "https://github.com/cvteam19/cv_project/blob/main/baseline/training_history.json",
+    "reference_history_sha256": "b69bf3ca8db4cf15130f3f998a96bc6b38c73a3e7958b2a874ba491c08b51c6b",
+    "baseline_logged_epochs": 6,
+    "baseline_elapsed_seconds": 14488.2,
+    "baseline_duration": "4 h 1 min 28.2 s",
+    "baseline_gpu": "Tesla T4",
+    "baseline_scheduler": "CosineAnnealingLR(T_max=6, eta_min=1e-6)",
+    "yolo_start": "fresh COCO-pretrained yolov8s.pt; no resume",
+    "yolo_time_limit_seconds": 14488.2,
+    "yolo_patience": 3,
+    "duration_scope": "training plus in-loop validation; dataset preparation and final evaluation excluded",
+    "caveat": "equal time limits do not guarantee equal elapsed times if early stopping triggers; LR schedules still differ"
+  },
   "last_epoch_may_be_partial": true,
-  "best": "/kaggle/working/yolov8s_agreed_3h/train/weights/best.pt",
-  "best_fitness": 0.34107,
+  "best": "/kaggle/working/yolov8s_baseline_time/train/weights/best.pt",
+  "best_fitness": 0.34542,
   "selection": "maximum validation torchmetrics COCO mAP@0.5:0.95",
   "effective_training_args": {
     "task": "detect",
     "mode": "train",
     "model": "yolov8s.pt",
-    "data": "/kaggle/working/yolov8s_agreed_3h/data.yaml",
-    "epochs": 16,
-    "time": 3.0,
+    "data": "/kaggle/working/yolov8s_baseline_time/data.yaml",
+    "epochs": 21,
+    "time": 4.024500000000001,
     "patience": 3,
     "batch": 4,
     "imgsz": 640,
@@ -20,7 +35,7 @@
     "cache": false,
     "device": "0",
     "workers": 2,
-    "project": "/kaggle/working/yolov8s_agreed_3h",
+    "project": "/kaggle/working/yolov8s_baseline_time",
     "name": "train",
     "exist_ok": false,
     "pretrained": true,
@@ -111,6 +126,6 @@
     "erasing": 0.4,
     "cfg": null,
     "tracker": "botsort.yaml",
-    "save_dir": "/kaggle/working/yolov8s_agreed_3h/train"
+    "save_dir": "/kaggle/working/yolov8s_baseline_time/train"
   }
 }

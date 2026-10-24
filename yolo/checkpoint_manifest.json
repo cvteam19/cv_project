@@ -1,14 +1,14 @@
 {
   "checkpoint": "selected_best.pt",
-  "bytes": 22494826,
-  "sha256": "054780cd560b52a2243954afa18494fbd993a2222a04d5860cd08d32263847ec",
-  "selected_epoch": 14,
+  "bytes": 22495274,
+  "sha256": "fb07b1aefc26ef86efd6d7fa8eab1d51d9b7345f28c89cb35db508b4ddde2355",
+  "selected_epoch": 17,
   "selection_split": "val",
   "selection_metric": "torchmetrics COCO mAP@0.5:0.95",
-  "logged_best_validation_map50_95": 0.34107,
-  "reevaluated_validation_map50_95": 0.34119048714637756,
-  "source_archive": "yolov8s_agreed_3h_artifacts.zip",
-  "source_archive_sha256": "33e2a552c53b7b65303a992995a26a13d6cb384b3dd9333101b074e83c64b0b8",
+  "logged_best_validation_map50_95": 0.34542,
+  "reevaluated_validation_map50_95": 0.3452436327934265,
+  "source_archive": "yolov8s_baseline_time_artifacts.zip",
+  "source_archive_sha256": "ebc6295de863c2d56b14ce15996059fd6e5e1b687a2373f2539d81afa3c5ccb0",
   "test_results_in_this_package": false,
   "inference_adapter": "final_yolo_protocol.predict_with_baseline_input"
 }

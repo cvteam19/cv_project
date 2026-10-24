@@ -1,0 +1,14 @@
+{
+  "source": "https://github.com/cvteam19/cv_project/blob/main/baseline/training_history.json",
+  "reference_history_sha256": "b69bf3ca8db4cf15130f3f998a96bc6b38c73a3e7958b2a874ba491c08b51c6b",
+  "baseline_logged_epochs": 6,
+  "baseline_elapsed_seconds": 14488.2,
+  "baseline_duration": "4 h 1 min 28.2 s",
+  "baseline_gpu": "Tesla T4",
+  "baseline_scheduler": "CosineAnnealingLR(T_max=6, eta_min=1e-6)",
+  "yolo_start": "fresh COCO-pretrained yolov8s.pt; no resume",
+  "yolo_time_limit_seconds": 14488.2,
+  "yolo_patience": 3,
+  "duration_scope": "training plus in-loop validation; dataset preparation and final evaluation excluded",
+  "caveat": "equal time limits do not guarantee equal elapsed times if early stopping triggers; LR schedules still differ"
+}

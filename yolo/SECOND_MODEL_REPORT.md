@@ -24,36 +24,45 @@ no Nesterov), batch 4, FP32 without AMP, horizontal flips p=0.5, and checkpoint 
 by maximum validation mAP@0.5:0.95. YOLO uses the baseline's resize/normalization/padding:
 aspect ratio preserved, max dimension 640, ImageNet normalization and batch padding.
 
-The completed runs did not fully match the intended common time budget. YOLO used
-cosine LR decay by elapsed time over three hours; the baseline retained six-epoch
-cosine decay. Both used Tesla T4 GPUs.
+To bring training durations closer, YOLO was retrained from the original COCO weights
+with a time budget of 14,488.2 seconds, taken from the baseline log. Both runs used
+Tesla T4 GPUs. YOLO retains time-based cosine LR decay; Faster R-CNN retains cosine
+decay over six epochs.
 
-| Setting | Updated Faster R-CNN | YOLOv8s |
+| Setting | Updated Faster R-CNN | YOLOv8s rerun |
 |---|---:|---:|
-| Logged epochs | 6 | 16; final epoch incomplete |
-| Selected epoch | 6 | 14 |
-| Recorded duration | About 4 h 1 min | About 3 h 3 min |
-| LR schedule | Cosine over 6 epochs | Cosine over 3 hours |
+| Logged epochs | 6 | 20 |
+| Selected epoch | 6 | 17 |
+| Recorded duration | 14,488.2 s (about 4 h 1 min) | 14,419.82 s (about 4 h) |
+| LR schedule | Cosine over 6 epochs | Cosine over the configured time budget |
+
+YOLO's three epochs after epoch 17 did not improve validation mAP, consistent with
+the configured early-stopping patience of three. Its recorded training-call duration
+was approximately 68 seconds shorter than the baseline duration.
 
 ## Initial results
 
-| Recorded validation metric | Updated Faster R-CNN | YOLOv8s |
+| Recorded validation metric | Updated Faster R-CNN | YOLOv8s rerun |
 |---|---:|---:|
-| mAP@0.5 | 0.7675 | 0.6379 |
-| mAP@0.5:0.95 | 0.4204 | 0.3412 |
+| mAP@0.5 | 0.7675 | 0.6484 |
+| mAP@0.5:0.95 | 0.4204 | 0.3452 |
 
-The recorded validation scores favour Faster R-CNN. Different training durations,
-LR schedules and inference filtering prevent interpreting this as an isolated
-architecture effect. A unified evaluation of the completed checkpoints is still needed.
+The recorded validation scores favour Faster R-CNN. Training durations are now close,
+but LR schedules and inference-filtering settings still differ. These results therefore
+do not isolate architecture effects; a common evaluation of the selected checkpoints
+is still required.
 
 For YOLO, confidence 0.30 maximized validation micro-F1. At that threshold, micro
-precision/recall/F1 were 0.6649/0.5785/0.6187. There were 53 false-positive boxes across
-1,375 empty validation images: 0.0385 FP/image, below the project target of 0.5.
-Fire recall was 0.5005, making missed fire instances a priority for further inspection.
+precision/recall/F1 were 0.7114/0.5800/0.6390, with 2,280 TP, 925 FP and 1,651 FN.
+There were 39 false-positive boxes across 1,375 empty validation images:
+0.0284 FP/image, below the project target of 0.5. Fire recall was 0.5041, making
+missed fire instances a priority for inspection.
 
-This folder contains validation results, not final YOLO test results. The new SGD
-checkpoint is retained as the project's second working model. Unified test evaluation,
-speed comparison and detailed error analysis are assigned to the evaluation lead.
+This folder contains validation results, not final YOLO test results. The baseline-time
+rerun replaces the earlier three-hour run as the active second-model checkpoint.
+Unified test evaluation, speed comparison and detailed error analysis are assigned
+to the evaluation lead. No completed hard-negative or RT-DETR experiment is claimed.
 
 Sources: [YOLO metrics](yolov8s_val_metrics.json), [training log](train/results.csv),
-[run summary](training_summary.json), [baseline history](../baseline/training_history.json).
+[run summary](training_summary.json), [baseline duration](baseline_budget_reference.json),
+[baseline history](../baseline/training_history.json), [verification](validation_audit.json).

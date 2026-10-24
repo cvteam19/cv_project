@@ -868,7 +868,7 @@ tzlocal==5.4.4
 ucxx-cu12==0.48.0
 ujson==6.0.0
 ultralytics==8.3.221
-ultralytics-thop==2.2.2
+ultralytics-thop==2.2.3
 umap-learn==0.5.12
 umf==1.0.3
 universal_pathlib==0.3.10
