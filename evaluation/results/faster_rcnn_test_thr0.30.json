@@ -1,0 +1,54 @@
+{
+  "model": "Faster R-CNN ResNet-50 FPN",
+  "model_type": "faster_rcnn",
+  "checkpoint": "/kaggle/input/datasets/c3m3nt/cv-project-checkpoints/faster_rcnn_best.pth",
+  "checkpoint_epoch": 6,
+  "split": "test",
+  "test_images_dir": "/kaggle/input/datasets/linxel/dfire-prepared/data/test/images",
+  "num_images": 4306,
+  "mAP@0.5": 0.7687333226203918,
+  "mAP@0.5:0.95": 0.411173015832901,
+  "per_class_mAP@0.5:0.95": {
+    "smoke": 0.47000017762184143,
+    "fire": 0.35234588384628296
+  },
+  "per_class_PRF@0.5": {
+    "smoke": {
+      "precision": 0.5457,
+      "recall": 0.8884,
+      "f1": 0.6761,
+      "tp": 2046,
+      "fp": 1703,
+      "fn": 257
+    },
+    "fire": {
+      "precision": 0.4107,
+      "recall": 0.8301,
+      "f1": 0.5495,
+      "tp": 2389,
+      "fp": 3428,
+      "fn": 489
+    }
+  },
+  "confusion_matrix": [
+    [
+      0,
+      1688,
+      3418
+    ],
+    [
+      249,
+      2043,
+      11
+    ],
+    [
+      472,
+      18,
+      2388
+    ]
+  ],
+  "fps": 21.287010200435308,
+  "iou_thresh": 0.5,
+  "score_thresh_prf": 0.3,
+  "score_thresh_inference": 0.001
+}

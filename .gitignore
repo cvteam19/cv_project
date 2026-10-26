@@ -1,2 +1,3 @@
-evaluation/fp_analysis/crops/
+evaluation/evaluation_faster_rcnn/fp_analysis/crops/
+evaluation/evaluation_yolo/fp_analysis/crops/
 *.pth
