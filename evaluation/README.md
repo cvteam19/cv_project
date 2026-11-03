@@ -119,7 +119,7 @@ FRCN at 0.55 (its macro-F1 maximum) yields FP/img=0.697 — above the project's
 
 ## Known limitations
 
-11. **Training budget is time-matched, not compute-matched.** LR schedules differ
+1. **Training budget is time-matched, not compute-matched.** LR schedules differ
    (Faster R-CNN epoch-based cosine, YOLOv8s wall-clock cosine). The comparison is
    a **controlled budget-matched study**, not an isolated architecture effect.
 2. **Operating thresholds are per-model** (0.55 FRCN, 0.30 YOLOv8s), each
