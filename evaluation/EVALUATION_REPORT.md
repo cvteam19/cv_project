@@ -2,69 +2,96 @@
 
 **Evaluation lead:** Ekaterina Kuznetsova
 
+**Confidence threshold protocol.**
+- `score_low = 0.001` — floor for mAP; mAP is threshold-independent.
+- Operating threshold for P/R/F1 — **validation-tuned per model**:
+  YOLOv8s @ **0.30**;
+  Faster R-CNN @ **0.55**.
+- FRCN is additionally reported at 0.30 (inherited for a unified-comparison point)
+  and 0.70 (near its F1-maximum and within the FP budget) for transparency.
 ---
 
 ## 1. Main metrics
 
-| Metric | Faster R-CNN R50-FPN (epoch 6) | YOLOv8s (epoch 17, SGD rerun) |
-|---|---:|---:|
-| **mAP@0.5** | **0.7687** | 0.6348 |
-| **mAP@0.5:0.95** | **0.4112** | 0.3423 |
-| smoke mAP@0.5:0.95 | **0.4700** | 0.3972 |
-| fire mAP@0.5:0.95 | **0.3523** | 0.2874 |
+| Model | mAP@0.5 | mAP@0.5:0.95 | smoke AP@0.5:0.95 | fire AP@0.5:0.95 |
+|---|---:|---:|---:|---:|
+| **Faster R-CNN R50-FPN** (ep 6) | **0.7687** | **0.4112** | **0.4700** | **0.3523** |
+| **YOLOv8s** (ep 17, SGD rerun) | 0.6348 | 0.3423 | 0.3972 | 0.2874 |
+| Δ (FRCN − YOLO) | **+0.134** | **+0.069** | **+0.073** | **+0.065** |
 
 Both mAP metrics are **threshold-independent**: they are computed over the full
 precision-recall curve with `score_low=0.001`, NMS IoU 0.7, max_det 100.
-The two models therefore have a **fixed accuracy gap of +13.4 pp (mAP@0.5) and
-+6.9 pp (mAP@0.5:0.95)** in favour of Faster R-CNN, independent of the operating
-threshold. Per-class AP shows the same pattern: FRCN wins on both smoke (+7.3 pp)
-and fire (+6.5 pp).
+
 
 ---
 
 ## 2. Per-class P / R / F1
 
 P/R/F1 are **threshold-dependent**: they describe the model at a specific operating
-point. The operating threshold is chosen per model; for YOLOv8s it is `0.30`
-(locked from validation in the main-model track); for Faster R-CNN both `0.30`
-(unified-comparison point) and `0.70` (closer to its F1 optimum) are reported.
+point.
 
-### 2.1. Faster R-CNN @ conf=0.30 (unified-comparison point)
+### 2.1. Faster R-CNN @ conf=0.55 (validation-tuned)
 
 | Class | Precision | Recall | F1 | TP | FP | FN |
 |---|---:|---:|---:|---:|---:|---:|
-| smoke | 0.546 | **0.888** | 0.676 | 2046 | 1703 | 257 |
-| fire  | 0.411 | **0.830** | 0.549 | 2389 | 3428 | 489 |
+| smoke | 0.680 | 0.853 | **0.756** | 1964 | 925 | 339 |
+| fire  | 0.538 | 0.767 | **0.633** | 2209 | 1893 | 669 |
 
-### 2.2. Faster R-CNN @ conf=0.70 (F1-biased point)
-
-| Class | Precision | Recall | F1 | TP | FP | FN |
-|---|---:|---:|---:|---:|---:|---:|
-| smoke | **0.758** | 0.823 | **0.789** | 1895 | 605 | 408 |
-| fire  | **0.618** | 0.722 | **0.666** | 2079 | 1287 | 799 |
-
-### 2.3. YOLOv8s @ conf=0.30 (locked from validation)
+### 2.2. YOLOv8s @ conf=0.30 (validation-tuned)
 
 | Class | Precision | Recall | F1 | TP | FP | FN |
 |---|---:|---:|---:|---:|---:|---:|
-| smoke | **0.735** | 0.662 | **0.697** | 1524 | **549** | 779 |
-| fire  | **0.670** | 0.475 | **0.556** | 1366 | **673** | 1512 |
+| smoke | 0.735 | 0.662 | 0.697 | 1524 | 549 | 779 |
+| fire  | 0.670 | 0.475 | 0.556 | 1366 | 673 | 1512 |
+
+### 2.3. Sensitivity: FRCN at three operating points
+
+To make threshold sensitivity explicit, we report FRCN at three points:
+
+| Threshold | smoke P | smoke R | smoke F1 | fire P | fire R | fire F1 | macro F1 | FP/img | FP/empty |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0.30 (inherited) | 0.546 | **0.888** | 0.676 | 0.411 | **0.830** | 0.549 | 0.613 | 1.103 | 0.128 |
+| **0.55 (tuned)** | **0.680** | 0.853 | **0.756** | **0.538** | 0.767 | **0.633** | **0.694** | 0.697 | 0.078 |
+| 0.70 (F1-biased) | **0.758** | 0.823 | **0.789** | **0.618** | 0.722 | **0.666** | **0.728** | **0.420** | **0.044** |
+
+**Observation.** The validation sweep selected 0.55 by macro-F1. At that point,
+FRCN's FP/img is **0.697 — above the project FP budget of 0.5**. If the FP budget
+is treated as a hard constraint, a higher threshold (~0.65–0.70) is required. Both constraints are shown; the choice depends on the
+deployment objective.
+
 
 **Interpretation:**
 
 - **YOLOv8s is precision-oriented** (high P, moderate R at its locked threshold).
 - **Faster R-CNN is recall-oriented at 0.30** (very high R, low P) and becomes
-  **F1-balanced at 0.70** (P and R both ~0.72–0.82).
+  **F1-balanced at 0.55-0.70**.
 - The F1 of Faster R-CNN **increases by ~10 pp per class** when moving from 0.30 to 0.70.
   This is **not evidence that 0.30 is unfair to FRCN** — it is evidence that
-  0.30 is not FRCN's optimal F1 point. A validation-side threshold sweep (planned,
-  see §8) will identify FRCN's optimum.
+  0.30 is not FRCN's optimal F1 point.
 
 ---
 
 ## 3. Confusion matrices (rows = GT, cols = pred)
 
-### Faster R-CNN @ 0.30
+### Faster R-CNN @ 0.55 (tuned)
+
+|              | pred bg | pred smoke | pred fire |
+|---|---:|---:|---:|
+| **GT bg**    | 0 | 911 | 1882 |
+| **GT smoke** | 329 | 1963 | 11 |
+| **GT fire**  | 654 | 15 | 2209 |
+
+### YOLOv8s @ 0.30 (tuned)
+
+|              | pred bg | pred smoke | pred fire |
+|---|---:|---:|---:|
+| **GT bg**    | 0 | 536 | 668 |
+| **GT smoke** | 773 | 1523 | 7 |
+| **GT fire**  | 1500 | 14 | 1364 |
+
+### (Reference) Faster R-CNN @ 0.30 and @ 0.70
+
+#### Faster R-CNN @ 0.30
 
 |              | pred bg | pred smoke | pred fire |
 |--------------|---------|------------|-----------|
@@ -72,7 +99,7 @@ point. The operating threshold is chosen per model; for YOLOv8s it is `0.30`
 | **GT smoke** | 249     | 2043       | 11        |
 | **GT fire**  | 472     | 18         | 2388      |
 
-### Faster R-CNN @ 0.70
+#### Faster R-CNN @ 0.70
 
 |              | pred bg | pred smoke | pred fire |
 |--------------|---------|------------|-----------|
@@ -80,13 +107,6 @@ point. The operating threshold is chosen per model; for YOLOv8s it is `0.30`
 | **GT smoke** | 399     | 1894       | 10        |
 | **GT fire**  | 787     | 12         | 2079      |
 
-### YOLOv8s @ 0.30
-
-|              | pred bg | pred smoke | pred fire |
-|--------------|---------|------------|-----------|
-| **GT bg**    | 0       | 536        | 668       |
-| **GT smoke** | 773     | 1523       | 7         |
-| **GT fire**  | 1500    | 14         | 1364      |
 
 **Notes:**
 
@@ -94,8 +114,8 @@ point. The operating threshold is chosen per model; for YOLOv8s it is `0.30`
   detectors: they never output "background" as a class. A 0 in this column
   represents a **false negative**, not a background prediction.
 - **Class confusion smoke↔fire is negligible** across all operating points
-  (11+18=29 FRCN@0.30; 10+12=22 FRCN@0.70; 7+14=21 YOLO@0.30 out of thousands of
-  predictions). The two models do **not** confuse the classes; their gaps are
+  (<=29 out of thousands of
+  predictions across all runs). The two models do **not** confuse the classes; their gaps are
   localization- and miss-driven.
 
 ---
@@ -118,8 +138,7 @@ point. The operating threshold is chosen per model; for YOLOv8s it is `0.30`
 
 **Observations:**
 
-- **Both models pass the project FP budget (<0.5 FP/img)** at their respective
-  operating thresholds: FRCN at 0.70 (0.420) and YOLOv8s at 0.30 (0.223).
+- **YOLOv8s meets the project FP budget (<0.5 FP/img)** at 0.30 (0.223). **FRCN exceeds it at its tuned 0.55** (0.697) and needs ≥0.65 to meet the budget.
 - **YOLOv8s is consistently 2–5× better on false alarms** at every threshold:
   FP/empty 0.033 vs 0.128 @0.30; FP/img 0.223 vs 1.103 @0.30.
 - **FRCN's FP count is highly threshold-sensitive** (10× drop in FP/img from 0.30
@@ -133,29 +152,14 @@ by **both models** at an appropriate threshold. The differences are:
 
 | Model | Operating threshold | mAP@0.5 | smoke F1 | fire F1 | FP/img | FP/empty |
 |---|---:|---:|---:|---:|---:|---:|
-| Faster R-CNN | 0.70 (F1-biased) | **0.769** | **0.789** | **0.666** | 0.420 | 0.044 |
+| Faster R-CNN | 0.70 (budget-compliant, not tuned) | **0.769** | **0.789** | **0.666** | 0.420 | 0.044 |
 | YOLOv8s | 0.30 (validated) | 0.635 | 0.697 | 0.556 | **0.223** | **0.033** |
 
 - **Faster R-CNN has the higher accuracy** (mAP and F1, both classes).
 - **YOLOv8s has the lower false-alarm rate** (2× fewer FP/img, 1.3× fewer FP/empty).
 - **Neither dominates on all axes**.
 
-### 4.3. FP categorization (pending)
 
-500 FP candidates per model are extracted to `fp_analysis/<model>/fp_candidates.csv`,
-sorted by confidence. Planned category schema:
-
-| ID | Category |
-|---|---|
-| `C` | Clouds |
-| `F` | Fog / haze |
-| `L` | Artificial lighting |
-| `B` | Bright/reflective objects |
-| `S` | Smoke-as-fire (cross-class confusion between smoke and fire boxes) |
-| `O` | Other (unclassified) |
-
-**Manual labelling is in progress for both models.** Category distribution and
-1–2 representative examples per category will be reported.
 
 ---
 
@@ -194,17 +198,58 @@ benchmark above is the **only reliable cross-model speed comparison**.
 
 ---
 
-## 6. Failure cases (planned)
+## 6. Failure cases
 
-Three representative failure cases will be selected after FP categorization:
+We report **six representative failure cases** (one per category per model). All six figures (and some more representative failure cases) are in `figures/<model>_failure_cases/`.
 
-1. A missed fire instance (FN) — small or partially occluded fire.
-2. A smoke→cloud or cloud→smoke FP — the canonical confusion from the project brief.
-3. A bright/reflective-object fire FP (sun, lights, reflections) — the dominant
-   FRCN failure mode by raw count.
+### 6.1. Case A — missed fire (FN), YOLOv8s
 
-Each case will include the original image with GT boxes (green) and predictions (red),
-and a one-sentence likely cause.
+![failure_yolo_fn](figures/yolo_failure_cases/missed_fire_0.jpg)
+
+**Likely cause.** A very small flame, on such image might be mistaken for flashlight. YOLOv8s' fire recall is
+0.475 at 0.30 — the lowest recall among the four model/class combinations — so this is the expected failure mode.
+
+### 6.2. Case B — missed fire (FN), Faster R-CNN
+
+![failure_frcn_fn](figures/faster_rcnn_failure_cases/missed_fire_0.jpg)
+
+**Likely cause.** Prediction with IoU < 0.5 → classified as FN. FRCN actually found fire, but predicted box is much smaller than GT (a localization failure counted as FN). Possibly because on this image fire is heavily occluded by smoke.
+
+### 6.3. Case C — cloud/smoke FP, YOLOv8s
+
+![failure_yolo_cloud](figures/yolo_failure_cases/cloud_smoke_fp_2.jpg)
+
+**Likely cause.** Cloud texture and luminance match smoke plumes. The model has
+no contrastive cloud-vs-smoke training signal. This is canonical confusion.
+
+### 6.4. Case D — cloud/smoke FP, Faster R-CNN
+
+![failure_frcn_cloud](figures/faster_rcnn_failure_cases/cloud_smoke_fp_3.jpg)
+
+**Likely cause.** Same failure mode as 6.3. FRCN has 925 smoke false positives at
+0.55 (vs YOLOv8s' 536 at 0.30), so the category is shared across
+models, though FRCN's are more numerous.
+
+### 6.5. Case E — bright-object fire FP, YOLOv8s
+
+![failure_yolo_bright](figures/yolo_failure_cases/bright_fire_fp_2.jpg)
+
+**Likely cause.** Bright orange/yellow region (sunset) resembles fire.
+
+### 6.6. Case F — bright-object fire FP, Faster R-CNN
+
+![failure_frcn_bright](figures/faster_rcnn_failure_cases/bright_fire_fp_3.jpg)
+
+**Likely cause.** Same failure mode as 6.5, but the dominant error category for
+FRCN: 1,893 fire FPs at 0.55. FRCN's ROI head
+lacks full-image context and triggers on bright patches near the fire colour
+range; this is consistent with the observed fire-FP gap.
+
+### 6.7. Observation
+
+**Both models fail on the same visual categories** (clouds, bright objects,
+small fires). What differs is
+the **frequency** and **confidence distribution**.
 
 ---
 
@@ -212,7 +257,7 @@ and a one-sentence likely cause.
 
 - Code: `evaluation.ipynb`, `speed_benchmark.ipynb`.
 - Environment: Kaggle T4, `ultralytics==8.3.221`, `torchmetrics`, `torch`, `torchvision`.
-- Runtime: ~5 min inference + metrics on 4,306 test images per model per threshold.
+- Runtime: ~7 min inference + metrics on 4,306 test images per model per threshold.
 - Dataset: linxel/dfire-prepared.
 - Seeds: dataset splits unchanged. Model checkpoints are the selected validation-best
   checkpoints; evaluation does not re-train.
@@ -226,16 +271,16 @@ and a one-sentence likely cause.
 1. **Training budget is time-matched, not compute-matched.** LR schedules differ
    (Faster R-CNN epoch-based cosine, YOLOv8s wall-clock cosine). The comparison is
    a **controlled budget-matched study**, not an isolated architecture effect.
-2. **Threshold 0.30 was locked from YOLOv8s validation** and applied to FRCN for
-   a unified comparison. This is reported transparently: FRCN at 0.30 is recall-biased
-   (P=0.55, R=0.89), while at 0.70 it is F1-biased (P=0.76, R=0.82). Both points
-   are included to avoid cherry-picking.
-3. **FPS in per-run JSONs** varies 2–3× across sessions; only the controlled
+2. **Operating thresholds are per-model** (0.55 FRCN, 0.30 YOLOv8s), each
+   selected on validation with a different metric (macro-F1 vs micro-F1). The
+   FRCN threshold is at its macro-F1 maximum but produces FP/img=0.697, above
+   the project's 0.5 budget; §2.3 shows the 0.70 point that satisfies the
+   budget.
+3. **Failure cases are manually selected** from the automatically extracted
+   candidate pool (`find_failure_cases` in `evaluation.ipynb`), and the choice
+   of representative examples is subjective. Six cases across two
+   models cover the three main failure categories; more granular distributions
+   would require manual labelling of all 500+ FP candidates per model, which
+   is out of scope for this submission.
+4. **FPS in per-run JSONs** varies 2–3× across sessions; only the controlled
    benchmark is used for cross-model comparison.
-
-### 8.2. Remaining work (evaluation track)
-
-1. **Manual FP categorization** for both models: 500 samples each, 6 categories.
-   Produce the per-category distribution table and 1–2 representative examples
-   per category.
-2. **3 representative failure cases** with original images.

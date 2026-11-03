@@ -16,9 +16,10 @@
 - `results/speed_benchmark.json` — controlled speed benchmark output.
 - `figures/confusion_matrix_*.png` — one per model per threshold.
 - `figures/per_class_prf_*.png` — one per model per threshold.
-- `figures/fp_examples_*.png` — representative false positives by category (pending).
-- `fp_analysis/<model>/fp_candidates.csv` — top-500 FPs per model, sorted by
-  confidence, with a manual `category` column (C/F/L/B/S/O).
+- `figures/yolo_failure_cases/*.jpg` — representative YOLOv8s failure cases (by category).
+- `figures/faster_rcnn_failure_cases/*.jpg` — representative FRCN failure cases (by category).
+- `fp_analysis/<model>/fp_candidates.csv` — top FPs per model, sorted by
+  confidence (regenerable from the notebook).
 - `fp_analysis/<model>/crops/` — crops of FP boxes (regenerable from the notebook).
 
 ---
@@ -47,7 +48,7 @@
      (0.30 for YOLOv8s; 0.70 for Faster R-CNN).
 3. **Run All**. Results land in `/kaggle/working/evaluation/`.
 
-Runtime: ~5 min inference + metrics for one model on 4,306 images on T4.
+Runtime: ~7 min inference + metrics for one model on 4,306 images on T4.
 
 ### Note on YOLOv8s
 
@@ -81,16 +82,22 @@ See `SECOND_MODEL_REPORT.md` for details.
 
 ## Results summary
 
-### Accuracy
+### Accuracy (threshold-independent)
 
-| Model | Threshold | mAP@0.5 | mAP@0.5:0.95 | smoke F1 | fire F1 | FP/img | FP/empty |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| Faster R-CNN R50-FPN | 0.30 | **0.7687** | **0.4112** | 0.676 | 0.549 | 1.103 | 0.128 |
-| Faster R-CNN R50-FPN | 0.70 | **0.7687** | **0.4112** | **0.789** | **0.666** | 0.420 | 0.044 |
-| YOLOv8s (SGD, epoch 17) | 0.30 | 0.6348 | 0.3423 | 0.697 | 0.556 | **0.223** | **0.033** |
+| Model | mAP@0.5 | mAP@0.5:0.95 | smoke AP | fire AP |
+|---|---:|---:|---:|---:|
+| **Faster R-CNN R50-FPN** | **0.7687** | **0.4112** | **0.4700** | **0.3523** |
+| YOLOv8s | 0.6348 | 0.3423 | 0.3972 | 0.2874 |
 
-mAP is threshold-independent; P/R/F1/FP vary with the operating confidence threshold.
-The two FRCN rows show the same model at two operating points (see `EVALUATION_REPORT.md` §4).
+### Operating points (validation-tuned thresholds)
+
+| Model | Threshold | smoke F1 | fire F1 | macro F1 | FP/img | FP/empty |
+|---|---:|---:|---:|---:|---:|---:|
+| **Faster R-CNN @ 0.55** | 0.55 | **0.756** | **0.633** | **0.694** | 0.697 | 0.078 |
+| **YOLOv8s @ 0.30** | 0.30 | 0.697 | 0.556 | 0.626 | **0.223** | **0.033** |
+
+FRCN at 0.55 (its macro-F1 maximum) yields FP/img=0.697 — above the project's
+0.5 budget. At 0.70, FRCN meets the budget (FP/img=0.420)  (see `EVALUATION_REPORT.md` §2.3).
 
 ### Speed (controlled benchmark, T4, same session)
 
@@ -101,7 +108,7 @@ The two FRCN rows show the same model at two operating points (see `EVALUATION_R
 
 **Summary of comparison:**
 
-- **Faster R-CNN** — higher mAP (0.769 vs 0.635) and higher F1 at its tuned threshold,
+- **Faster R-CNN** — higher mAP (0.769 vs 0.635) and higher F1 at appropriate threshold,
   but ~3.3× slower and with more false alarms at equivalent recall.
 - **YOLOv8s** — lower mAP and F1, but 3.3× faster and with ~2–4× fewer false alarms.
 - Both models pass the project's FP budget (< 0.5 FP/img) when operating at an appropriate
@@ -112,14 +119,19 @@ The two FRCN rows show the same model at two operating points (see `EVALUATION_R
 
 ## Known limitations
 
-1. **Training budget is time-matched, not compute-matched.** LR schedules differ
-   (Faster R-CNN epoch-based, YOLOv8s wall-clock). The comparison is a controlled
-   budget-matched study, not an isolated architecture effect.
-2. **Threshold 0.30 was locked from YOLOv8s validation** and applied to Faster R-CNN
-   for a unified comparison. FRCN at 0.30 is recall-biased (P=0.55, R=0.89); at 0.70
-   it is F1-biased (P=0.76, R=0.82). A **validation-side threshold sweep for FRCN**
-   is planned to identify its F1-maximizing operating point — this is remaining work.
-3. **FPS across sessions varies 2–3×** due to Kaggle free-tier GPU contention.
-   Use the **controlled benchmark** (`speed_benchmark.json`), not the per-run FPS in
-   `results/*_test_thr*.json`, for any cross-model comparison.
-4. **FP categorization** (top-500 per model) is manual labelling — **in progress**.
+11. **Training budget is time-matched, not compute-matched.** LR schedules differ
+   (Faster R-CNN epoch-based cosine, YOLOv8s wall-clock cosine). The comparison is
+   a **controlled budget-matched study**, not an isolated architecture effect.
+2. **Operating thresholds are per-model** (0.55 FRCN, 0.30 YOLOv8s), each
+   selected on validation with a different metric (macro-F1 vs micro-F1). The
+   FRCN threshold is at its macro-F1 maximum but produces FP/img=0.697, above
+   the project's 0.5 budget; §2.3 shows the 0.70 point that satisfies the
+   budget.
+3. **Failure cases are manually selected** from the automatically extracted
+   candidate pool (`find_failure_cases` in `evaluation.ipynb`), and the choice
+   of representative examples is subjective. Six cases across two
+   models cover the three main failure categories; more granular distributions
+   would require manual labelling of all 500+ FP candidates per model, which
+   is out of scope for this submission.
+4. **FPS in per-run JSONs** varies 2–3× across sessions; only the controlled
+   benchmark is used for cross-model comparison.
