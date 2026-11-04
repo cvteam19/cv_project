@@ -54,7 +54,7 @@ To make threshold sensitivity explicit, we report FRCN at three points:
 | **0.55 (tuned)** | **0.680** | 0.853 | **0.756** | **0.538** | 0.767 | **0.633** | **0.694** | 0.697 | 0.078 |
 | 0.70 (F1-biased) | **0.758** | 0.823 | **0.789** | **0.618** | 0.722 | **0.666** | **0.728** | **0.420** | **0.044** |
 
-**Observation.** The validation sweep selected 0.55 by macro-F1. At that point,
+**Observation.** The validation sweep selected 0.55 by micro-F1. At that point,
 FRCN's FP/img is **0.697 — above the project FP budget of 0.5**. If the FP budget
 is treated as a hard constraint, a higher threshold (~0.65–0.70) is required. Both constraints are shown; the choice depends on the
 deployment objective.
@@ -152,7 +152,8 @@ by **both models** at an appropriate threshold. The differences are:
 
 | Model | Operating threshold | mAP@0.5 | smoke F1 | fire F1 | FP/img | FP/empty |
 |---|---:|---:|---:|---:|---:|---:|
-| Faster R-CNN | 0.70 (budget-compliant, not tuned) | **0.769** | **0.789** | **0.666** | 0.420 | 0.044 |
+| Faster R-CNN | 0.55 (micro-F1 max) | 0.769 | 0.756 | 0.633 | 0.697 | 0.078 |
+| Faster R-CNN | 0.70 (budget-compliant) | 0.769 | 0.789 | 0.666 | 0.420 | 0.044 |
 | YOLOv8s | 0.30 (validated) | 0.635 | 0.697 | 0.556 | **0.223** | **0.033** |
 
 - **Faster R-CNN has the higher accuracy** (mAP and F1, both classes).
@@ -271,16 +272,11 @@ the **frequency** and **confidence distribution**.
 1. **Training budget is time-matched, not compute-matched.** LR schedules differ
    (Faster R-CNN epoch-based cosine, YOLOv8s wall-clock cosine). The comparison is
    a **controlled budget-matched study**, not an isolated architecture effect.
-2. **Operating thresholds are per-model** (0.55 FRCN, 0.30 YOLOv8s), each
-   selected on validation with a different metric (macro-F1 vs micro-F1). The
-   FRCN threshold is at its macro-F1 maximum but produces FP/img=0.697, above
-   the project's 0.5 budget; §2.3 shows the 0.70 point that satisfies the
-   budget.
-3. **Failure cases are manually selected** from the automatically extracted
+2. **Failure cases are manually selected** from the automatically extracted
    candidate pool (`find_failure_cases` in `evaluation.ipynb`), and the choice
    of representative examples is subjective. Six cases across two
    models cover the three main failure categories; more granular distributions
    would require manual labelling of all 500+ FP candidates per model, which
    is out of scope for this submission.
-4. **FPS in per-run JSONs** varies 2–3× across sessions; only the controlled
+3. **FPS in per-run JSONs** varies 2–3× across sessions; only the controlled
    benchmark is used for cross-model comparison.
