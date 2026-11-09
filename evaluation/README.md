@@ -11,7 +11,8 @@
   FPS, FP-vs-threshold sweep, and extracts top-K false positives.
 - `speed_benchmark.ipynb` — controlled speed benchmark for both models
   (warmup, CUDA sync, GPU-only measurement).
-- `results/faster_rcnn_test_thr0.70.json` — FRCN test metrics at score=0.70.
+- `results/faster_rcnn_test_thr0.30.json`, `_thr0.55.json`, `_thr0.70.json` — FRCN
+  test metrics at three operating points.
 - `results/yolo_test_thr0.30.json` — YOLOv8s test metrics at score=0.30.
 - `results/speed_benchmark.json` — controlled speed benchmark output.
 - `figures/confusion_matrix_*.png` — one per model per threshold.
@@ -45,7 +46,7 @@
    - `ckpt` — path to the checkpoint.
    - `protocol_dir` — path to the **folder** containing the two `.py` files.
    - `score_prf` — the operating confidence threshold for this run
-     (0.30 for YOLOv8s; 0.70 for Faster R-CNN).
+     (0.30 for YOLOv8s; 0.55 for Faster R-CNN).
 3. **Run All**. Results land in `/kaggle/working/evaluation/`.
 
 Runtime: ~7 min inference + metrics for one model on 4,306 images on T4.
@@ -76,7 +77,9 @@ See `SECOND_MODEL_REPORT.md` for details.
   `.cpu().numpy()`. **Not comparable across sessions** due to Kaggle free-tier GPU contention.
 - **FP/empty** — average false positives on the **2,008 completely empty test images**
   (no GT boxes). This is the **false-alarm rate** — the operationally relevant metric.
-- **FP/img** — average FP across all 4,306 test images (mixes false alarms and localization errors).
+- **FP/img** — average **class-aware** FP across all 4,306 test images
+  (`(smoke_FP + fire_FP) / 4306`). A prediction is FP iff its best IoU with a GT
+  of the same class is below 0.5. Includes false alarms and localization errors.
 
 ---
 
@@ -93,11 +96,11 @@ See `SECOND_MODEL_REPORT.md` for details.
 
 | Model | Threshold | smoke F1 | fire F1 | macro F1 | FP/img | FP/empty |
 |---|---:|---:|---:|---:|---:|---:|
-| **Faster R-CNN @ 0.55** | 0.55 | **0.756** | **0.633** | **0.694** | 0.697 | 0.078 |
-| **YOLOv8s @ 0.30** | 0.30 | 0.697 | 0.556 | 0.626 | **0.223** | **0.033** |
+| **Faster R-CNN @ 0.55** | 0.55 | **0.756** | **0.633** | **0.694** | 0.654 | 0.078 |
+| **YOLOv8s @ 0.30** | 0.30 | 0.697 | 0.556 | 0.626 | **0.284** | **0.033** |
 
-FRCN at 0.55 yields FP/img=0.697 — above the project's
-0.5 budget. At 0.70, FRCN meets the budget (FP/img=0.420)  (see `EVALUATION_REPORT.md` §2.3).
+FRCN at 0.55 yields FP/img=0.654 — above the project's
+0.5 budget. At 0.70, FRCN meets the budget (FP/img=0.439)  (see `EVALUATION_REPORT.md` §2.3).
 
 ### Speed (controlled benchmark, T4, same session)
 
