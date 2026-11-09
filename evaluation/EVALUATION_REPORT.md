@@ -50,12 +50,12 @@ To make threshold sensitivity explicit, we report FRCN at three points:
 
 | Threshold | smoke P | smoke R | smoke F1 | fire P | fire R | fire F1 | macro F1 | FP/img | FP/empty |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 0.30 (inherited) | 0.546 | **0.888** | 0.676 | 0.411 | **0.830** | 0.549 | 0.613 | 1.103 | 0.128 |
-| **0.55 (tuned)** | **0.680** | 0.853 | **0.756** | **0.538** | 0.767 | **0.633** | **0.694** | 0.697 | 0.078 |
-| 0.70 (F1-biased) | **0.758** | 0.823 | **0.789** | **0.618** | 0.722 | **0.666** | **0.728** | **0.420** | **0.044** |
+| 0.30 (inherited) | 0.546 | **0.888** | 0.676 | 0.411 | **0.830** | 0.549 | 0.613 | 1.192 | 0.128 |
+| **0.55 (tuned)** | **0.680** | 0.853 | **0.756** | **0.538** | 0.767 | **0.633** | **0.694** | 0.654 | 0.078 |
+| 0.70 (F1-biased) | **0.758** | 0.823 | **0.789** | **0.618** | 0.722 | **0.666** | **0.728** | **0.439** | **0.044** |
 
 **Observation.** The validation sweep selected 0.55 by micro-F1. At that point,
-FRCN's FP/img is **0.697 — above the project FP budget of 0.5**. If the FP budget
+FRCN's FP/img is **0.654 — above the project FP budget of 0.5**. If the FP budget
 is treated as a hard constraint, a higher threshold (~0.65–0.70) is required. Both constraints are shown; the choice depends on the
 deployment objective.
 
@@ -122,28 +122,29 @@ deployment objective.
 
 ## 4. False-positive analysis across thresholds
 
-### 4.1. FP rate vs confidence threshold
+### 4.1. FP rate
 
-| Threshold | FRCN FP/img | FRCN FP/empty | YOLOv8s FP/img | YOLOv8s FP/empty |
-|---|---:|---:|---:|---:|
-| 0.10 | 3.650 | 2.685 | 0.755 | 0.102 |
-| **0.30** | 1.103 | 0.128 | **0.223** | **0.033** |
-| 0.50 | 0.697 | 0.078 | 0.077 | 0.016 |
-| **0.70** | **0.420** | **0.044** | 0.016 | 0.005 |
+| Model | Threshold | FP/img (class-aware) | FP/empty |
+|---|---:|---:|---:|
+| Faster R-CNN | 0.30 | 1.192 | 0.128 |
+| Faster R-CNN | **0.55** (tuned) | 0.654 | 0.078 |
+| Faster R-CNN | 0.70 | 0.439 | 0.044 |
+| YOLOv8s | **0.30** (tuned) | 0.284 | 0.033 |
 
 - `FP/empty` — average FP per completely empty test image (2,008 / 4,306); this is
   the **false-alarm rate** relevant to real deployment.
 - `FP/img` — average FP across all 4,306 test images (mixes false alarms and
-  localization errors).
+  localization errors). A prediction is FP iff its best IoU
+  with a GT box **of the same class** is below 0.5 (greedy one-to-one matching).
+  This equals `(smoke_FP + fire_FP) / 4306`.
 
 **Observations:**
 
-- **YOLOv8s meets the project FP budget (<0.5 FP/img)** at 0.30 (0.223). **FRCN exceeds it at its tuned 0.55** (0.697) and needs ≥0.65 to meet the budget.
-- **YOLOv8s is consistently 2–5× better on false alarms** at every threshold:
-  FP/empty 0.033 vs 0.128 @0.30; FP/img 0.223 vs 1.103 @0.30.
-- **FRCN's FP count is highly threshold-sensitive** (10× drop in FP/img from 0.30
+- **YOLOv8s meets the project FP budget (<0.5 FP/img)** at 0.30. **FRCN exceeds it at its tuned 0.55** and needs ≥0.65 to meet the budget.
+- **YOLOv8s is consistently 2–5× better on false alarms** at its tuned threshold.
+- **FRCN's FP count is highly threshold-sensitive** (2.7× drop in FP/img from 0.30
   to 0.70) because it produces many low-confidence proposals on hard negatives.
-  **YOLOv8s is comparatively robust** (only 3× drop from 0.10 to 0.30, then flat).
+  YOLOv8s is comparatively robust.
 
 ### 4.2. Per-model operating points
 
@@ -152,12 +153,13 @@ by **both models** at an appropriate threshold. The differences are:
 
 | Model | Operating threshold | mAP@0.5 | smoke F1 | fire F1 | FP/img | FP/empty |
 |---|---:|---:|---:|---:|---:|---:|
-| Faster R-CNN | 0.55 (micro-F1 max) | 0.769 | 0.756 | 0.633 | 0.697 | 0.078 |
-| Faster R-CNN | 0.70 (budget-compliant) | 0.769 | 0.789 | 0.666 | 0.420 | 0.044 |
-| YOLOv8s | 0.30 (validated) | 0.635 | 0.697 | 0.556 | **0.223** | **0.033** |
+| Faster R-CNN | 0.55 (micro-F1 max) | 0.769 | 0.756 | 0.633 | 0.654 | 0.078 |
+| Faster R-CNN | 0.70 (budget-compliant) | 0.769 | 0.789 | 0.666 | 0.439 | 0.044 |
+| YOLOv8s | 0.30 (validated) | 0.635 | 0.697 | 0.556 | **0.284** | **0.033** |
 
 - **Faster R-CNN has the higher accuracy** (mAP and F1, both classes).
-- **YOLOv8s has the lower false-alarm rate** (2× fewer FP/img, 1.3× fewer FP/empty).
+- **YOLOv8s has the lower false-alarm rate** (2.3× fewer FP/img: 0.284 vs 0.654;
+  2.4× fewer FP/empty: 0.033 vs 0.078).
 - **Neither dominates on all axes**.
 
 
@@ -280,3 +282,9 @@ the **frequency** and **confidence distribution**.
    is out of scope for this submission.
 3. **FPS in per-run JSONs** varies 2–3× across sessions; only the controlled
    benchmark is used for cross-model comparison.
+4. **Validation/test distribution drift.** Test images contain ~2.4× more GT boxes
+   per image than validation (12,800+ / 4,306 ≈ 3.0 vs 3,931 / 3,099 ≈ 1.27).
+   Micro-F1 on test continues to rise beyond the validation-optimal threshold:
+   0.687 at 0.55 vs 0.711 at 0.70. Threshold
+   selection is done on validation only (no test leakage); the drift is documented
+   here as a limitation.
