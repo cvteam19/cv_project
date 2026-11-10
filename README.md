@@ -10,7 +10,7 @@ This repository provides a complete, reproducible pipeline for detecting visible
 #Powershell
 
 # 1. Build the image (takes ~2-3 minutes)
-docker build -t fire-detection 
+docker build -t fire-detection .
 
 # 2. Run the demo (inference + metrics)
 docker run --rm -v ${PWD}/results:/app/results fire-detection
