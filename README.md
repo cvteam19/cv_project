@@ -7,13 +7,14 @@ This repository provides a complete, reproducible pipeline for detecting visible
 ### Quick Start (Docker)
 
 ```bash
-#Powershell
-
 # 1. Build the image (takes ~2-3 minutes)
 docker build -t fire-detection .
 
 # 2. Run the demo (inference + metrics)
 docker run --rm -v ${PWD}/results:/app/results fire-detection
+
+#Linux/Mac
+#docker run --rm -v $(pwd)/results:/app/results fire-detection
 ```
 
 **What it does:**
@@ -23,15 +24,14 @@ The container runs `demo_inference.py` (draws bounding boxes on test images) and
 ### Alternative: Local Python 
 If you prefer to run locally, you need Python 3.11+
 ```bash
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+python -m venv venv                   #Linux/Mac: python3 -m venv venv
+venv\Scripts\activate                 #Linux/Mac: source venv/bin/activate
 pip install -r requirements.txt
 python scripts/demo_inference.py --images demo_test/images --out results
 python scripts/eval_on_demo.py --data demo_test --out results
 ```
 
 ---
-
 
 
 ### Training & Full Evaluation
