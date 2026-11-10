@@ -100,7 +100,7 @@ on 6 representative D-Fire test images and produces side-by-side visualizations
 
 ### Results 
 
-**Dataset:**
+**Test set:**
 
 Official evaluation was conducted on the full test set of **4,306 images** on a Tesla T4 GPU. Detailed metrics are available in `evaluation/results/*.json`.
 
@@ -118,11 +118,11 @@ Official evaluation was conducted on the full test set of **4,306 images** on a 
 </div>
 
 **False Positives Analysis:** 
-The dataset includes 9,841 empty-label images (category `AoF` - Absence of Fire) to measure false positives caused by clouds, fog, lighting, and bright objects. At their selected operating thresholds, Faster R-CNN produced more false positives (0.654 FP/img), exceeding the target of 0.5. YOLOv8s was more conservative (0.284 FP/img), meeting the requirement. Representative failure cases (clouds mistaken for smoke, sunsets mistaken for fire) are saved in `evaluation/figures/`.
+The test set includes 2,008 empty-label images (category `AoF` - Absence of Fire) to measure false positives caused by clouds, fog, lighting, and bright objects. At their selected operating thresholds, Faster R-CNN produced more false positives (0.654 FP/img), exceeding the target of 0.5. YOLOv8s was more conservative (0.284 FP/img), meeting the requirement. Representative failure cases (clouds mistaken for smoke, sunsets mistaken for fire) are saved in `evaluation/figures/`.
 
 ---
 
-**Demo_test sample:**
+**`demo_test` sample:**
 
 To prove that the pipeline works end-to-end, the Docker container can run a quick evaluation on the 23 labeled images from `demo_test/` (50 ground-truth boxes). Despite the small sample size, the results closely match the official test set metrics:
 
@@ -149,10 +149,10 @@ Team 19, Innopolis University.
 
 | Member | Role & Contribution |
 |---|---|
-| Daria Potapova | Team leader & Main model lead — YOLOv8-s training and tuning, hard-negative fine-tuning ablation, resolution and threshold sensitivity experiments |
-| Aksiniia Miasoedova | Data lead — dataset download and split verification, dataloader setup for all models, curation of the hard-negative subset |
-| Maria Karpova | Baseline lead — Faster R-CNN (ResNet-50 + FPN) implementation and training, head replacement for 2 classes, baseline metrics on validation/test, environment and runtime logging |
-| Ekaterina Kuznetsova | Evaluation and analysis lead — unified evaluation scripts, false-positive categorization, false-negative inspection, all tables and figures |
+| Daria Potapova | Team leader & Main model lead — YOLOv8s implementation, fine-tuning, and training |
+| Aksiniia Miasoedova | Data lead — dataset preparation, annotation validation, dataset packaging, and data-loading pipelines |
+| Maria Karpova | Baseline lead — Faster R-CNN baseline implementation and training |
+| Ekaterina Kuznetsova | Evaluation and analysis lead — model evaluation, metric analysis, speed benchmarking, and failure analysis |
 
 </div>
 
