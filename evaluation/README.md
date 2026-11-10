@@ -32,7 +32,7 @@
 1. Kaggle notebook, GPU T4, Internet ON.
 2. Add inputs:
    - **Dataset** — `linxel/dfire-prepared`.
-   - **Checkpoints** — a dataset folder with:
+   - **Checkpoints** — a dataset folder (`/kaggle/input/datasets/c3m3nt/cv-project-checkpoints`) with:
      - `yolo_selected_best.pt` (YOLOv8s)
      - `faster_rcnn_best.pth` (Faster R-CNN)
      - `final_yolo_protocol.py` and `budget_protocol.py`
