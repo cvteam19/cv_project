@@ -1,0 +1,12 @@
+.git
+venv
+.venv
+__pycache__
+*.ipynb_checkpoints
+data/
+checkpoints/
+*.pth
+*.pt
+results/
+.pip-cache
+Ultralytics

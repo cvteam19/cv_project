@@ -1,0 +1,27 @@
+# configs/baseline_config.yaml
+model:
+  name: fasterrcnn_resnet50_fpn
+  pretrained: COCO_V1
+  num_classes: 3          # background + smoke + fire
+  input_size: 640
+
+training:
+  epochs: 6
+  batch_size: 4
+  optimizer: SGD
+  lr: 0.005
+  momentum: 0.9
+  weight_decay: 0.0005
+  scheduler: CosineAnnealingLR
+  scheduler_t_max: 6
+  scheduler_eta_min: 1.0e-6
+  early_stopping_patience: 3
+  grad_clip_max_norm: 10.0
+
+data:
+  num_workers: 2
+  pin_memory: true
+  augmentation:
+    horizontal_flip_p: 0.5
+
+seed: 42
