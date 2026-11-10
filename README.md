@@ -112,13 +112,13 @@ Official evaluation was conducted on the full test set of **4,306 images** on a 
 | mAP@0.5:0.95 | 0.4112 | 0.3423 |
 | Smoke F1 | 0.756 | 0.697 |
 | Fire F1 | 0.633 | 0.556 |
-| FP / image | 0.697 | 0.223 |
+| FP / image | 0.654 | 0.284 |
 | Speed (T4 GPU) | 23.3 img/s | 76.6 img/s |
 
 </div>
 
 **False Positives Analysis:** 
-The dataset includes 9,841 empty-label images (category `AoF` - Absence of Fire) to measure false positives caused by clouds, fog, lighting, and bright objects. At their selected operating thresholds, Faster R-CNN produced more false positives (0.697 FP/img), exceeding the target of 0.5. YOLOv8s was more conservative (0.223 FP/img), meeting the requirement. Representative failure cases (clouds mistaken for smoke, sunsets mistaken for fire) are saved in `evaluation/figures/`.
+The dataset includes 9,841 empty-label images (category `AoF` - Absence of Fire) to measure false positives caused by clouds, fog, lighting, and bright objects. At their selected operating thresholds, Faster R-CNN produced more false positives (0.654 FP/img), exceeding the target of 0.5. YOLOv8s was more conservative (0.284 FP/img), meeting the requirement. Representative failure cases (clouds mistaken for smoke, sunsets mistaken for fire) are saved in `evaluation/figures/`.
 
 ---
 
